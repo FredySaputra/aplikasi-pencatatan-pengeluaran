@@ -1,13 +1,21 @@
 package repository;
 
 import Util.ConnectionUtil;
+import com.zaxxer.hikari.HikariDataSource;
 import entity.Pengeluaran;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PengeluaranRepositoryImpl implements PengeluaranRepository{
+    public DataSource dataSource;
+
+    public PengeluaranRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public void save(Pengeluaran pengeluaran) {
         String sql = "INSERT INTO pengeluaran (jumlah, keterangan, tanggal) VALUES (?,?,?)";
@@ -63,7 +71,7 @@ public class PengeluaranRepositoryImpl implements PengeluaranRepository{
     }
 
     @Override
-    public List<Pengeluaran> findByPengeluaranId(int id) {
+    public Pengeluaran findByPengeluaranId(Integer id) {
         String sql = "SELECT * FROM pengeluaran WHERE id = ?";
         try(Connection connection = ConnectionUtil.getDataSource().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
@@ -71,16 +79,14 @@ public class PengeluaranRepositoryImpl implements PengeluaranRepository{
             preparedStatement.setInt(1,id);
             preparedStatement.execute();
                 ResultSet resultSet = preparedStatement.executeQuery();
-                List<Pengeluaran> list = new ArrayList<>();
-                while (resultSet.next()) {
-                    Pengeluaran pengeluaran = new Pengeluaran();
+                Pengeluaran pengeluaran = new Pengeluaran();
+                if (resultSet.next()) {
+                    pengeluaran.setId(resultSet.getInt("id"));
                     pengeluaran.setJumlah(resultSet.getDouble("jumlah"));
                     pengeluaran.setKeterangan(resultSet.getString("keterangan"));
                     pengeluaran.setTanggal(resultSet.getDate("tanggal"));
-
-                    list.add(pengeluaran);
                 }
-                return list;
+                return pengeluaran;
             }else{
                 return null;
             }
