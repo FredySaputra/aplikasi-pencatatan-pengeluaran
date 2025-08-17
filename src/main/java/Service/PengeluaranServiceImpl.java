@@ -29,6 +29,8 @@ public class PengeluaranServiceImpl implements PengeluaranService{
         Pengeluaran pengeluaran = pengeluaranRepository.findByPengeluaranId(id);
         if(pengeluaran != null){
             System.out.println(pengeluaran.getId() + " . " + pengeluaran.getJumlah()+ "  "+ pengeluaran.getKeterangan() + "  " + pengeluaran.getTanggal());
+        }else{
+            System.out.println("Tidak ada id sesuai inputan");
         }
     }
 
